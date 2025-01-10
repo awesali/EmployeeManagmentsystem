@@ -1,31 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EmployeeManagmentsystem.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-[ApiController]
-[Route("api/auth")]
-public class AuthController : ControllerBase
+namespace EmployeeManagmentsystem.Models
 {
-    private readonly JwtService _jwtService;
-
-    public AuthController(JwtService jwtService)
+    [ApiController]
+    [Route("api/auth")]
+    public class AuthController : ControllerBase
     {
-        _jwtService = jwtService;
-    }
+        private readonly JwtService _jwtService;
+        private readonly EmployeeDb _dbContext;
 
-    [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
-    {
-        if (request.Username == "admin" && request.Password == "password")
+        public AuthController(JwtService jwtService, EmployeeDb dbContext)
         {
-            var token = _jwtService.GenerateToken(request.Username, "Admin");
-            return Ok(new { Token = token });
+            _jwtService = jwtService;
+            _dbContext = dbContext;
         }
 
-        return Unauthorized("Invalid credentials");
-    }
-}
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] User request)
+        {
+            // Fetch user from database based on username
+            var user = await _dbContext.user.FirstOrDefaultAsync(u => u.Username == request.Username);
+           
+            if (user == null || user.PasswordHash != request.PasswordHash)
+            {
+                return Unauthorized("Invalid credentials");
+            }
 
-public class LoginRequest
-{
-    public string Username { get; set; }
-    public string Password { get; set; }
+            // Generate JWT Token
+            var token = _jwtService.GenerateToken(user.Username);
+            return Ok(new { Token = token });
+        }
+    }
 }

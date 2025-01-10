@@ -7,12 +7,12 @@ public class JwtService
 {
    
 
-    public string GenerateToken(string username, string role)
+    public string GenerateToken(string Username)
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role)
+            new Claim(ClaimTypes.Name, Username),
+           
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("jdfoiogfxfcghilkfjgxhciuojfhxgbnbcmvbjyf"));

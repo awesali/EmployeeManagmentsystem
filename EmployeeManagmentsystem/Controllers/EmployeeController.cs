@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿
+using System.Runtime.InteropServices;
 using EmployeeManagmentsystem.Data;
 using EmployeeManagmentsystem.Models;
 using Microsoft.AspNetCore.Http;
@@ -44,7 +45,7 @@ namespace EmployeeManagmentsystem.Controllers
 
 
             _context.SaveChanges();
-            return NotFound();
+            return Ok(_context.employees.ToList());
         }
 
         [HttpDelete("{Id}")]
